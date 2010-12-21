@@ -1,14 +1,16 @@
 module Mongol
   module Timestamps
-    extend ActiveSupport::Concern
 
-    module ClassMethods
-      def timestamps!
-        @_track_timestamps = true
-      end
+    def timestamps!
+      @_track_timestamps = true
+      include Mongol::Timestamps::TimestampMethods
     end
 
-    module InstanceMethods
+    def timestamps?
+      !!@_track_timestamps
+    end
+
+    module TimestampMethods
       def save
         attributes[:created_at] = Time.now if attributes[:created_at].blank?
         attributes[:updated_at] = Time.now

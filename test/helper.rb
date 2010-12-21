@@ -17,3 +17,9 @@ end
 class Book
   include Mongol::Document
 end
+
+class BookWithTimestamps
+  include Mongol::Document
+  timestamps!
+end
+

@@ -5,10 +5,6 @@ module Mongol
   module Document
     extend ActiveSupport::Concern
 
-    included do
-      include Mongol::Timestamps # must include after the original save
-    end
-
     module InstanceMethods
       def initialize(new_attributes = {})
         self.attributes = new_attributes.symbolize_keys || {}
@@ -77,6 +73,7 @@ module Mongol
 
     module ClassMethods
       include Mongol::QueryStuff
+      include Mongol::Timestamps
 
       def collection
         @collection ||= Mongol.database[self.name.tableize]
