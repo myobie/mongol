@@ -1,8 +1,13 @@
 require_relative 'document/query'
+require_relative 'document/timestamps'
 
 module Mongol
   module Document
     extend ActiveSupport::Concern
+
+    included do
+      include Mongol::Timestamps # must include after the original save
+    end
 
     module InstanceMethods
       def initialize(new_attributes = {})
