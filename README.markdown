@@ -1,5 +1,7 @@
 # This isn't finished yet.
 
+I am only testing on Ruby 1.9.2 and I make lots of use of the new Hash syntax.
+
 The things that work:
 
 - Models
