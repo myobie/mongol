@@ -38,10 +38,9 @@ This list will be kept up to date.
 
     Book.where(name: "Moby Dick").limit(3).all
 
-    Book.where(:name.in => ["Moby Dick", "Something Else"]).size # also
-    .count
+    Book.where(:name.in => ["Moby Dick", "Something Else"]).size
 
-    # other query methods include: fields, skip, sort, exists?, each, paginate, get
+    # other query methods include: count, fields, skip, sort, exists?, each, paginate, get
 
     Book.first.authors.first
 
