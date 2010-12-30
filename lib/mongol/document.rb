@@ -47,6 +47,17 @@ module Mongol
         !dirty?
       end
 
+      def savable?
+        dirty? && not_being_saved?
+      end
+
+      def being_saved?
+        @being_saved
+      end
+      def now_being_saved?
+        !being_saved?
+      end
+
     private
       def dup_original_attributes
         @original_attributes = attributes.dup
@@ -54,6 +65,8 @@ module Mongol
     public
 
       def save
+        @being_saved = true # this would work betterw with an Identity Map
+
         save_associations || ( return false ) # this will cause an infinite loop
 
         if (new_document?)
@@ -63,10 +76,12 @@ module Mongol
             self.id = new_id
             dup_original_attributes
           end
+          @being_saved = false
           !!new_id
         else
           result = !!self.class.collection.update({'_id' => id}, attributes)
           dup_original_attributes if result
+          @being_saved = false
           result
         end
       end

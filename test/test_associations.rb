@@ -39,7 +39,7 @@ describe Mongol::Associations do
       BookWithAuthors.last.authors.first.must_be_kind_of Author
     end
 
-    it "must allow adding tot he array with << then saving the items in the array" do
+    it "must allow adding to the array with << then saving the items in the array" do
       @book = BookWithAuthors.new
       @book.authors << Author.new
       @book.save

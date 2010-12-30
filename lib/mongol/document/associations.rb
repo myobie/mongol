@@ -90,7 +90,7 @@ module Mongol
 
       def save
         ids.map do |doc|
-          if !doc.is_a?(BSON::ObjectId) && doc.dirty?
+          if !doc.is_a?(BSON::ObjectId) && doc.savable?
             doc.save
           else
             true # make sure things that don't need saving return true
