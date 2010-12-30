@@ -6,10 +6,6 @@ module Mongol
       include Mongol::Timestamps::TimestampMethods
     end
 
-    def timestamps?
-      !!@_track_timestamps
-    end
-
     module TimestampMethods
       def save
         attributes[:created_at] = Time.now if attributes[:created_at].blank?

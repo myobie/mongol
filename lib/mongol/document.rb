@@ -1,5 +1,6 @@
 require_relative 'document/query'
 require_relative 'document/timestamps'
+require_relative 'document/associations'
 
 module Mongol
   module Document
@@ -7,7 +8,8 @@ module Mongol
 
     module InstanceMethods
       def initialize(new_attributes = {})
-        self.attributes = new_attributes.symbolize_keys || {}
+        self.attributes = new_attributes.is_a?(Hash) ? new_attributes.symbolize_keys : {}
+        dup_original_attributes
       end
 
       def attributes
@@ -28,24 +30,51 @@ module Mongol
         attributes[:_id]
       end
       def id=(new_id)
-        attributes[:_id] = new_id
+        self.attributes[:_id] = new_id
       end
 
       def new_document?
         id.nil?
       end
-      def saved?
+      def saved? # rename this persisted?
         !new_document?
       end
 
+      def dirty?
+        new_document? || attributes != @original_attributes
+      end
+      def not_dirty?
+        !dirty?
+      end
+
+    private
+      def dup_original_attributes
+        @original_attributes = attributes.dup
+      end
+    public
+
       def save
+        save_associations || ( return false ) # this will cause an infinite loop
+
         if (new_document?)
+          # puts attributes
           new_id = self.class.collection.insert(attributes)
-          self.id = new_id if new_id
+          if new_id
+            self.id = new_id
+            dup_original_attributes
+          end
           !!new_id
         else
-          !!self.class.collection.update({'_id' => id}, attributes)
+          result = !!self.class.collection.update({'_id' => id}, attributes)
+          dup_original_attributes if result
+          result
         end
+      end
+
+      def save_associations
+        self.class.associations.map do |ass|
+          self.send(ass[:name]).save
+        end.all?
       end
 
       def update(new_attributes)
@@ -72,11 +101,17 @@ module Mongol
     end
 
     module ClassMethods
-      include Mongol::QueryStuff
+      include Mongol::Query
       include Mongol::Timestamps
+      include Mongol::Associations
 
       def collection
         @collection ||= Mongol.database[self.name.tableize]
+      end
+
+      # Just a simple array of hashes for now
+      def associations
+        @associations ||= []
       end
 
       def create(new_attributes = {})
