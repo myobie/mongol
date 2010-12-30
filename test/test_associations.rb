@@ -31,6 +31,21 @@ describe Mongol::Associations do
       @book.save
       BookWithAuthors.last.authors.first.must_be_kind_of Author
     end
+
+    it "must allow adding to the array with <<" do
+      @book = BookWithAuthors.new
+      @book.authors << Author.create
+      @book.save
+      BookWithAuthors.last.authors.first.must_be_kind_of Author
+    end
+
+    it "must allow adding tot he array with << then saving the items in the array" do
+      @book = BookWithAuthors.new
+      @book.authors << Author.new
+      @book.save
+      BookWithAuthors.last.authors.first.must_be_kind_of Author
+    end
+
   end
 
 end
