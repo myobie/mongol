@@ -8,6 +8,8 @@ require 'active_support/inflector'
 require 'active_support/concern'
 
 module Mongol
+  VERSION = '0.0.1'
+
   def self.connection
     @connection
   end
