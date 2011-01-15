@@ -65,7 +65,7 @@ module Mongol
     public
 
       def save
-        @being_saved = true # this would work betterw with an Identity Map
+        @being_saved = true # this would work better with an Identity Map
 
         save_associations || ( return false ) # this will cause an infinite loop
 
