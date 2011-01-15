@@ -54,7 +54,7 @@ module Mongol
       def being_saved?
         @being_saved
       end
-      def now_being_saved?
+      def not_being_saved?
         !being_saved?
       end
 
