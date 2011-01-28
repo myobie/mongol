@@ -63,7 +63,7 @@ module Mongol
       end
 
       define_method :"#{name}=" do |item|
-        send(name.to_sym).replace(item)
+        send(:"#{name}_relationship").replace(item)
       end
 
       associations.push(type: :from, name: name)
@@ -87,6 +87,10 @@ module Mongol
       def find_related
         find_and_store_related if not_found?
         @related
+      end
+
+      def replace(what)
+        @related = what
       end
 
       def save
