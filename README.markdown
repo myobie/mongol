@@ -9,14 +9,17 @@ The things that work:
 - Indexes
 - Saving
 - Querying (uses Plucky)
-- Many associations
+- Many associations (field is an array of id's of another model)
+- From associations (reverse many)
 
 What doesn't work now, but should eventually:
 
 - One associations
+- Many related associations (traditional has many)
 - Belongs to associations
 - Validations
-- Embedded documents
+- Embedded documents using models (so you can embed a Hash, just not
+  another model yet)
 - Identity Map
 - Something else?
 
@@ -34,6 +37,7 @@ This list will be kept up to date.
     class Author
       include Mongol::Document
       index :name
+      from :book
     end
 
     # Things you can do:
@@ -49,6 +53,10 @@ This list will be kept up to date.
     b = Book.first
     b.authors = [Author.create, Author.new]
     b.authors << Author.create
-    b.save
+    b.save # save's any unsaved authors
+
+    a = Author.new
+    a.book = Book.new
+    a.save # save's book
 
     # Associations support all the same query methods as models
