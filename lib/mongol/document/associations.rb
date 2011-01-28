@@ -90,6 +90,18 @@ module Mongol
       end
 
       def replace(what)
+        if found?
+          old_ids = @related.send(@instance.class.collection.name)
+          new_ids = old_ids.reject { |id| (id.is_a?(BSON::ObjectID) ? id : id.id) == @instance.id }
+          @related.send(:"#{@instance.class.collection.name}=", new_ids)
+        end
+
+        if what.respond_to?(:"#{@instance.class.collection.name}=")
+          old_ids = what.send(@instance.class.collection.name)
+          new_ids = old_ids << @instance
+          what.send(:"#{@instance.class.collection.name}=", new_ids)
+        end
+
         @related = what
       end
 
@@ -118,7 +130,7 @@ module Mongol
       end
 
       def save_related
-        @related.save if @related.savable?
+        @related.savable? ? @related.save : true
       end
 
     end

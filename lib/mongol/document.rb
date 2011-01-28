@@ -67,27 +67,37 @@ module Mongol
       def save
         @being_saved = true # this would work better with an Identity Map
 
-        save_associations || ( return false ) # this will cause an infinite loop
+        save_many_associations || ( return false ) # this will cause an infinite loop
 
-        if (new_document?)
+        save_result = if (new_document?)
           # puts attributes
           new_id = self.class.collection.insert(attributes)
           if new_id
             self.id = new_id
             dup_original_attributes
           end
-          @being_saved = false
           !!new_id
         else
           result = !!self.class.collection.update({'_id' => id}, attributes)
           dup_original_attributes if result
-          @being_saved = false
           result
         end
+
+        save_from_associations || ( return false )
+
+        @being_saved = false
+
+        save_result
       end
 
-      def save_associations
-        self.class.associations.map do |ass|
+      def save_many_associations
+        self.class.associations.select { |ass| ass[:type] == :many }.map do |ass|
+          self.send(:"#{ass[:name]}_relationship").save
+        end.all?
+      end
+
+      def save_from_associations
+        self.class.associations.select { |ass| ass[:type] == :from }.map do |ass|
           self.send(:"#{ass[:name]}_relationship").save
         end.all?
       end
