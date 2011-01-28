@@ -20,7 +20,8 @@ module Mongol
 
       ARRAY_METHODS.each do |m|
         define_method m.to_sym do |*args, &block|
-          model.materialize(super(*args, &block))
+          results = super(*args, &block)
+          results ? model.materialize(results) : results
         end
       end
 

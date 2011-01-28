@@ -16,19 +16,16 @@ end
 
 class Book
   include Mongol::Document
+  many :authors
 end
 
 class Author
   include Mongol::Document
+  from :book
 end
 
 class BookWithTimestamps
   include Mongol::Document
   timestamps!
-end
-
-class BookWithAuthors
-  include Mongol::Document
-  many :authors
 end
 

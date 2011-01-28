@@ -88,7 +88,7 @@ module Mongol
 
       def save_associations
         self.class.associations.map do |ass|
-          self.send(ass[:name]).save
+          self.send(:"#{ass[:name]}_relationship").save
         end.all?
       end
 

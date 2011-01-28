@@ -18,6 +18,10 @@ module Mongol
         end
       end
 
+      define_method :"#{name}_relationship" do
+        self.send(name.to_sym)
+      end
+
       define_method :"#{name}=" do |array|
         instance_variable_set(:"@_#{name}_association", AssociationArray.new(
           name: name,
@@ -32,12 +36,112 @@ module Mongol
       associations.push(type: :many, name: name)
     end
 
+    def many_related(name, options = {})
+    end
+
     def one(name, options = {})
     end
 
-    def belongs_to(name, options = {})
+    def from(name, options = {})
+      define_method name.to_sym do |opts = {}|
+        ass = instance_variable_get(:"@_#{name}_association")
+        rel_only = opts.delete(:relationship_only)
+        if ass
+          rel_only ? ass : ass.find_related
+        else
+          ass = instance_variable_set(:"@_#{name}_association", AssociationFromFinder.new(
+            name: name,
+            klass: options[:class] || name.to_s.classify.constantize,
+            instance: self
+          ))
+          rel_only ? ass : ass.find_related
+        end
+      end
+
+      define_method :"#{name}_relationship" do
+        self.send(name.to_sym, relationship_only: true)
+      end
+
+      define_method :"#{name}=" do |item|
+        send(name.to_sym).replace(item)
+      end
+
+      associations.push(type: :from, name: name)
     end
 
+    def on(name, options = {})
+    end
+
+    #belongs_to
+    class AssociationFromFinder
+
+      def initialize(options = {})
+        @options = options
+        @name = options[:name]
+        @klass = options[:klass]
+        @instance = options[:instance]
+        @related = nil
+        @found = false
+      end
+
+      def find_related
+        find_and_store_related if not_found?
+        @related
+      end
+
+      def save
+        found? ? save_related : true
+      end
+
+      def found?
+        !!@related
+      end
+      def not_found?
+        !found?
+      end
+
+      def nil?
+        @related === nil
+      end
+      def not_nil?
+        !nil?
+      end
+
+    private
+      def find_and_store_related
+        field_name = :"#{@instance.class.collection.name.singularize}_ids"
+        @related = @klass.where(field_name => @instance.id).first
+      end
+
+      def save_related
+        @related.save if @related.savable?
+      end
+
+    end
+
+    #one
+    class AssociationItem
+
+      def initialize(options = {})
+        @options = options
+        @name = options[:name]
+        @singular_name = options[:name].to_s.singularize
+        @klass = options[:klass]
+        @instance = options[:instance]
+        @max = options[:max] || 0
+        @min = options[:min] || 0
+
+        array = options[:ids] || []
+        if array.first.is_a?(BSON::ObjectId)
+          self.ids = array
+        else
+          self.ids = array.map { |doc| doc.saved? ? doc.id : doc }
+        end
+      end
+
+    end
+
+    #many
     class AssociationArray
       include Enumerable
       extend Forwardable
