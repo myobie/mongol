@@ -61,6 +61,13 @@ describe Mongol::Associations do
       @author.save
       Book.last.id.must_equal @author.book.id
     end
+
+    it "must save the related parent even if it's not saved" do
+      @author = Author.new
+      @author.book = Book.new
+      @author.save
+      Book.last.id.must_equal Author.last.book.id
+    end
   end
 
 end
