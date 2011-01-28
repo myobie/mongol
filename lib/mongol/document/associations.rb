@@ -69,7 +69,7 @@ module Mongol
       associations.push(type: :from, name: name)
     end
 
-    def on(name, options = {})
+    def belongs_to(name, options = {})
     end
 
     #belongs_to
