@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/myobie/mongol'
   s.add_dependency 'mongo', ['~>1.1.5']
   s.add_dependency 'plucky', ['~>0.3.6']
-  s.add_dependency 'active_support', ['~>3.0.3']
+  s.add_dependency 'activesupport', ['~>3.0.3']
 end
