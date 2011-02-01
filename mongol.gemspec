@@ -1,8 +1,6 @@
-require "./lib/mongol"
-
 Gem::Specification.new do |s|
   s.name = 'mongol'
-  s.version = Mongol::VERSION
+  s.version = "0.0.1"
   s.platform = Gem::Platform::RUBY
 
   s.summary = 'Super-lightweight Object Document Modelling wrapper for mongo'
@@ -17,4 +15,6 @@ Gem::Specification.new do |s|
   s.email = 'nathan@myobie.com'
   s.homepage = 'http://github.com/myobie/mongol'
   s.add_dependency 'mongo', ['~>1.1.5']
+  s.add_dependency 'plucky', ['~>0.3.6']
+  s.add_dependency 'active_support', ['~>3.0.3']
 end
